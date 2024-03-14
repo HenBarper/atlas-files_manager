@@ -1,4 +1,5 @@
-const redis = require('redis');
+// const redis = require('redis');
+import redis from 'redis';
 
 class RedisClient {
   // constructor that creates a client to Redis
@@ -10,14 +11,13 @@ class RedisClient {
     });
   }
 
-  // function isAlive that returns true when the connection to Redis is a success otherwise, false
+  // isAlive that returns true when the connection to Redis is a success otherwise, false
   isAlive() {
     return this.client.connected;
-    // console.log(this.client.connected);
-    // return true;
   }
 
-  // asynchronous function get that takes a string key as argument and returns the Redis value stored for this key
+  // asynchronous function that takes a string key argument
+  // and returns the Redis value stored for this key
   async get(key) {
     return new Promise((resolve, reject) => {
       this.client.get(key, (err, reply) => {
@@ -30,7 +30,8 @@ class RedisClient {
     });
   }
 
-  // asynchronous function set that takes a string key, a value and a duration in second as arguments to store it in Redis (with an expiration set by the duration argument)
+  // asynchronous set takes a string key, value and duration in
+  // seconds to store it in Redis (with an expiration set by the duration argument)
   async set(key, value, durationInSeconds) {
     return new Promise((resolve, reject) => {
       this.client.set(key, value, 'EX', durationInSeconds, (err, reply) => {
@@ -43,7 +44,7 @@ class RedisClient {
     });
   }
 
-  // asynchronous function del that takes a string key as argument and remove the value in Redis for this key
+  // asynchronous del that takes a string key argument and removes the value in Redis for this key
   async del(key) {
     return new Promise((resolve, reject) => {
       this.client.del(key, (err, reply) => {
@@ -57,5 +58,8 @@ class RedisClient {
   }
 }
 
+// Create an instance of the RedisClient class
 const redisClient = new RedisClient();
+
+// Export the redisClient instance to make it accessible from other files
 export default redisClient;
