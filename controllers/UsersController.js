@@ -1,8 +1,8 @@
-const User = require('../models/User');
 const sha1 = require('sha1');
+const dbClient = require('../utils/db');
 
-class UsersController = {
-  postUser: async (req, res) => {
+class UsersController {
+  static async postUser(req, res) {
     const { email, password } = req.body;
 
     if (!email) {
@@ -13,20 +13,23 @@ class UsersController = {
     }
 
     try {
-      const existingUser = await User.findOne({ email });
+      const existingUser = await dbClient.findUser({ email });
       if (existingUser) {
         return res.status(400).send({ error: 'Already exist' });
       }
 
       const sha1Password = sha1(password);
-      const newUser = new User({ email, password: sha1Password });
+      const newUser = {
+        email,
+        password: sha1Password,
+      };
       await newUser.save();
       return res.status(201).json({ id: newUser._id, email: newUser.email });
     } catch (error) {
-      console.error ("Error creating user: ", error);
-      return res.status(500).json({ error: "Internal service error" });
+      console.error('Error creating user: ', error);
+      return res.status(500).json({ error: 'Internal service error' });
     }
   }
-};
+}
 
 module.exports = UsersController;
