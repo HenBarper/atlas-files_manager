@@ -13,7 +13,7 @@ router.get('/status', AppController.getStatus);
 router.get('/stats', AppController.getStats);
 
 // Define users endpoint
-router.post('/users', UsersController.postUser);
+router.post('/users', UsersController.postNew);
 
 // export the router
 module.exports = router;
