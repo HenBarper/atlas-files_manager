@@ -1,8 +1,8 @@
 const User = require('../models/User');
 const sha1 = require('sha1');
 
-class UsersController = {
-  postUser: async (req, res) => {
+const UsersController = {
+  postNew: async (req, res) => {
     const { email, password } = req.body;
 
     if (!email) {
@@ -23,7 +23,7 @@ class UsersController = {
       await newUser.save();
       return res.status(201).json({ id: newUser._id, email: newUser.email });
     } catch (error) {
-      console.error ("Error creating user: ", error);
+      console.error("Error creating user: ", error);
       return res.status(500).json({ error: "Internal service error" });
     }
   }
