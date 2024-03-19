@@ -35,7 +35,6 @@ class UsersController {
     }
 
     try {
-      // try begin
       const userId = await redisClient.get(`auth_${token}`);
 
       if (!userId) {
@@ -48,11 +47,8 @@ class UsersController {
       }
 
       return res.status(200).json({ email: user.email, id: user._id });
-      // try end
-    } catch {
-      // catch begin
+    } catch (error) {
       return res.status(500).json({ error: "Internal Server Error" });
-      // catch end
     }
   }
 }
