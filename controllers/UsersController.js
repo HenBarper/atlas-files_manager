@@ -27,6 +27,34 @@ class UsersController {
       return res.status(500).json({ error: 'Internal service error' });
     }
   }
+
+  static async getMe(req, res) {
+    const userToken = req.headers('X-token');
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    try {
+      // try begin
+      const userId = await redisClient.get(`auth_${token}`);
+
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const user = await dbClient.users.findOne({ _id: new ObjectId(userId) });
+      if (!user) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      return res.status(200).json({ email: user.email, id: user._id });
+      // try end
+    } catch {
+      // catch begin
+      return res.status(500).json({ error: "Internal Server Error" });
+      // catch end
+    }
+  }
 }
 
 module.exports = UsersController;
