@@ -21,7 +21,7 @@ class UsersController {
       const sha1Password = sha1(password);
       const newUser = await dbClient.users.insertOne({ email, password: sha1Password });
       // await newUser.save();
-      return res.status(201).json({ id: newUser._id, email });
+      return res.status(201).json({ id: newUser.insertedId, email });
     } catch (error) {
       console.error('Error creating user: ', error);
       return res.status(500).json({ error: 'Internal service error' });
