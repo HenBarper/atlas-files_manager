@@ -12,20 +12,15 @@ class UsersController {
       return res.status(400).json({ error: 'Missing password' });
     }
 
-    try {
-      const existingUser = await dbClient.collection('users').findOne({ email });
-      if (existingUser) {
-        return res.status(400).json({ error: 'Already exist' });
-      }
-
-      const sha1Password = sha1(password);
-      const newUser = await dbClient.users.insertOne({ email, password: sha1Password });
-      // await newUser.save();
-      return res.status(201).json({ id: newUser._id, email: newUser.email });
-    } catch (error) {
-      console.error('Error creating user: ', error);
-      return res.status(500).json({ error: 'Internal service error' });
+    const existingUser = await dbClient.collection('users').findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Already exist' });
     }
+
+    const sha1Password = sha1(password);
+    const newUser = await dbClient.users.insertOne({ email, password: sha1Password });
+    // await newUser.save();
+    return res.status(201).json({ id: newUser.insertedId, email });
   }
 }
 
