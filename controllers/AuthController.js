@@ -28,7 +28,7 @@ class AuthController {
 
       return res.status(200).json({ token });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 
@@ -39,9 +39,20 @@ class AuthController {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    await redisClient.del(`auth_${token}`);
+    try {
+      const userId = await redisClient.get(`auth_${token}`);
 
-    return res.status(204).send();
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      await redisClient.del(`auth_${token}`);
+
+      return res.status(204).send();
+    } catch (error) {
+      console.error('Error during disconnection:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
   }
 }
 
