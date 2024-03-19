@@ -8,6 +8,9 @@ class DBClient {
     this.dbURL = `mongodb://${host}:${port}/${database}`;
     this.client = new MongoClient(this.dbURL, { useUnifiedTopology: true });
     this.client.connect();
+    this.db = this.client.db(database);
+    this.users = this.db.collection('users');
+    // this.files = this.db.collection('files');
   }
 
   isAlive() {
