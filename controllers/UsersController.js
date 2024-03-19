@@ -13,17 +13,14 @@ class UsersController {
     }
 
     try {
-      const existingUser = await dbClient.findUser({ email });
+      const existingUser = await dbClient.users.findOne({ email });
       if (existingUser) {
         return res.status(400).json({ error: 'Already exist' });
       }
 
       const sha1Password = sha1(password);
-      const newUser = {
-        email,
-        password: sha1Password,
-      };
-      await newUser.save();
+      const newUser = await dbClient.users.insertOne({ email, password: sha1Password });
+      // await newUser.save();
       return res.status(201).json({ id: newUser._id, email: newUser.email });
     } catch (error) {
       console.error('Error creating user: ', error);
