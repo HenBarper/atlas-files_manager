@@ -26,11 +26,11 @@ class FilesController {
     }
 
     if (!type) {
-      return res.status(400).json({ error: 'Missing Type' });
+      return res.status(400).json({ error: 'Missing type' });
     }
 
     const validTypes = ['folder', 'file', 'image'];
-    if (!type || !validTypes.includes(type)) {
+    if (!validTypes.includes(type)) {
       return res.status(400).json({ error: 'Invalid type' });
     }
 
@@ -49,6 +49,14 @@ class FilesController {
     }
 
     try {
+      if (type === 'folder') {
+        if (parentId !== '0') {
+          return res.status(400).json({ error: 'Cannot create a folder inside another folder' });
+        }
+      } else if (type !== 'folder' && parentId === '0') {
+        return res.status(400).json({ error: 'Cannot create a file at the root' });
+      }
+
       let localPath;
       if (type === 'file' || type === 'image') {
         const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
@@ -66,9 +74,6 @@ class FilesController {
         localPath: localPath || null,
       };
 
-      if (parentId !== '0') {
-        newFile.parentId = ObjectId(parentId);
-      }
       // if (type === 'folder') {
       //   if (parentId !== '0') {
       //     newFile.parentId = ObjectId(parentId);
