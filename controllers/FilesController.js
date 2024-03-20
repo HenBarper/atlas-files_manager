@@ -55,6 +55,13 @@ class FilesController {
         }
       } else if (type !== 'folder' && parentId === '0') {
         return res.status(400).json({ error: 'Cannot create a file at the root' });
+      } else if (parentId !== '0' && !ObjectId.isValid(parentId)) {
+        return res.status(400).json({ error: 'Invalid parentId' });
+      } else if (parentId !== '0') {
+        const parentFile = await dbClient.files.findOne({ _id: ObjectId(parentId) });
+        if (!parentFile || parentFile.type !== 'folder') {
+          return res.status(400).json({ error: 'Parent is not a folder' });
+        }
       }
 
       let localPath;
@@ -73,16 +80,6 @@ class FilesController {
         parentId: ObjectId(parentId),
         localPath: localPath || null,
       };
-
-      // if (type === 'folder') {
-      //   if (parentId !== '0') {
-      //     newFile.parentId = ObjectId(parentId);
-      //   }
-      // } else {
-      //   if (parentId !== '0') {
-      //     newFile.parentId = ObjectId(parentId);
-      //   }
-      // }
 
       const result = await dbClient.files.insertOne(newFile);
 
