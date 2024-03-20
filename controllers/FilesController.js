@@ -1,4 +1,5 @@
 const { ObjectId } = require('mongodb');
+const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const path = require('path');
 const redisClient = require('../utils/redis');
@@ -7,7 +8,13 @@ const dbClient = require('../utils/db');
 class FilesController {
   static async postUpload(req, res) {
     const userToken = req.headers['x-token'];
-    const { name, type, data, parentId = '0', isPublic = false } = req.body;
+    const {
+      name,
+      type,
+      data,
+      parentId = '0',
+      isPublic = false,
+    } = req.body;
 
     const userId = await redisClient.get(`auth_${userToken}`);
     if (!userId) {
@@ -15,12 +22,12 @@ class FilesController {
     }
 
     if (!name) {
-      return res.status(400).json({ error: 'Missing data'});
+      return res.status(400).json({ error: 'Missing data' });
     }
 
     const validTypes = ['folder', 'file', 'image'];
     if (!type || !validTypes.includes(type)) {
-      return res.status(400).json({ error: 'Missing or invalid type'});
+      return res.status(400).json({ error: 'Missing or invalid type' });
     }
 
     if (type !== 'folder' && !data) {
@@ -32,7 +39,7 @@ class FilesController {
       if (!parentFile) {
         return res.status(400).json({ error: 'Parent not found' });
       }
-      if(parentFile.type !== 'folder') {
+      if (parentFile.type !== 'folder') {
         return res.status(400).json({ error: 'Parent is not a foler' });
       }
     }
@@ -41,7 +48,7 @@ class FilesController {
       let localPath;
       if (type === 'file' || type === 'image') {
         const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
-        localPath = path.join(folderPath, `${uuid()}`);
+        localPath = path.join(folderPath, `${uuidv4()}`);
         const fileContent = Buffer.from(data, 'base64');
         fs.writeFileSync(localPath, fileContent);
       }
@@ -52,7 +59,7 @@ class FilesController {
         type,
         isPublic,
         parentId: ObjectId(parentId),
-        localPath: localPath || null
+        localPath: localPath || null,
       };
       const result = await dbClient.files.insertOne(newFile);
 
@@ -62,7 +69,7 @@ class FilesController {
         name,
         type,
         isPublic,
-        parentId
+        parentId,
       });
     } catch (error) {
       console.error('Error uploading file:', error);
