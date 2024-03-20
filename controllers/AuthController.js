@@ -8,7 +8,7 @@ class AuthController {
     try {
       const authHeader = req.headers.authorization;
 
-      if (!authHeader || !authHeader.startsWith('Basic ')) {
+      if (!authHeader) {
         return res.status(401).json({ error: 'Unatuhorized' });
       }
 
@@ -28,6 +28,7 @@ class AuthController {
 
       return res.status(200).json({ token });
     } catch (error) {
+      console.log('get connect error:', error);
       return res.status(500).json({ error: 'Internal Server Error' });
     }
   }
