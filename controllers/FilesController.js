@@ -22,7 +22,7 @@ class FilesController {
     }
 
     if (!name) {
-      return res.status(400).json({ error: 'Missing data' });
+      return res.status(400).json({ error: 'Missing name' });
     }
 
     const validTypes = ['folder', 'file', 'image'];
@@ -40,7 +40,7 @@ class FilesController {
         return res.status(400).json({ error: 'Parent not found' });
       }
       if (parentFile.type !== 'folder') {
-        return res.status(400).json({ error: 'Parent is not a foler' });
+        return res.status(400).json({ error: 'Parent is not a folder' });
       }
     }
 
@@ -61,6 +61,17 @@ class FilesController {
         parentId: ObjectId(parentId),
         localPath: localPath || null,
       };
+
+      if (type === 'folder') {
+        if (parentId !== '0') {
+          newFile.parentId = ObjectId(parentId);
+        }
+      } else {
+        if (parentId !== '0') {
+          newFile.parentId = ObjectId(parentId);
+        }
+      }
+
       const result = await dbClient.files.insertOne(newFile);
 
       return res.status(201).json({
