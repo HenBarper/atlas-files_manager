@@ -25,9 +25,13 @@ class FilesController {
       return res.status(400).json({ error: 'Missing name' });
     }
 
+    if (!type) {
+      return res.status(400).json({ error: 'Missing Type' });
+    }
+
     const validTypes = ['folder', 'file', 'image'];
     if (!type || !validTypes.includes(type)) {
-      return res.status(400).json({ error: 'Missing or invalid type' });
+      return res.status(400).json({ error: 'Invalid type' });
     }
 
     if (type !== 'folder' && !data) {
@@ -62,15 +66,18 @@ class FilesController {
         localPath: localPath || null,
       };
 
-      if (type === 'folder') {
-        if (parentId !== '0') {
-          newFile.parentId = ObjectId(parentId);
-        }
-      } else {
-        if (parentId !== '0') {
-          newFile.parentId = ObjectId(parentId);
-        }
+      if (parentId !== '0') {
+        newFile.parentId = ObjectId(parentId);
       }
+      // if (type === 'folder') {
+      //   if (parentId !== '0') {
+      //     newFile.parentId = ObjectId(parentId);
+      //   }
+      // } else {
+      //   if (parentId !== '0') {
+      //     newFile.parentId = ObjectId(parentId);
+      //   }
+      // }
 
       const result = await dbClient.files.insertOne(newFile);
 
