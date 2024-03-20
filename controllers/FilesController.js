@@ -39,6 +39,9 @@ class FilesController {
     }
 
     if (parentId !== '0') {
+      if (!ObjectId.isValid(parentId)) {
+        return res.status(400).json({ error: 'Invalid parentId' });
+      }
       const parentFile = await dbClient.files.findOne({ _id: ObjectId(parentId) });
       if (!parentFile) {
         return res.status(400).json({ error: 'Parent not found' });
@@ -55,13 +58,6 @@ class FilesController {
         }
       } else if (type !== 'folder' && parentId === '0') {
         return res.status(400).json({ error: 'Cannot create a file at the root' });
-      } else if (parentId !== '0' && !ObjectId.isValid(parentId)) {
-        return res.status(400).json({ error: 'Invalid parentId' });
-      } else if (parentId !== '0') {
-        const parentFile = await dbClient.files.findOne({ _id: ObjectId(parentId) });
-        if (!parentFile || parentFile.type !== 'folder') {
-          return res.status(400).json({ error: 'Parent is not a folder' });
-        }
       }
 
       let localPath;
